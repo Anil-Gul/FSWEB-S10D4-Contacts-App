@@ -1,8 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useAddNewContact } from '../services/mutations';
 
 export default function Form() {
+  const addContactMutation = useAddNewContact();
   const history = useHistory();
   const {
     register,
@@ -12,11 +14,8 @@ export default function Form() {
 
   const handleFormSubmit = (data) => {
     if (!isValid) return;
-    axios
-      .post(`https://65b36193770d43aba479a2f2.mockapi.io/users`, data)
-      .then((res) => {
-        history.push('/');
-      });
+    addContactMutation.mutate(data);
+    history.push('/');
   };
 
   return (

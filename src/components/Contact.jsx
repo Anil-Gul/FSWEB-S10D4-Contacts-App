@@ -1,30 +1,17 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
+import React from 'react';
+import { useParams, useHistory } from 'react-router-dom';
+import { useContactDetails } from '../services/queries';
+import { useDeleteContact } from '../services/mutations';
 
 export default function Contact() {
   const { contactId } = useParams();
-  const [contact, setContact] = useState();
+  const { data: contact, isPending, error } = useContactDetails(contactId);
+  const deleteContactMutation = useDeleteContact();
   const history = useHistory();
 
-  useEffect(() => {
-    axios
-      .get(`https://65b36193770d43aba479a2f2.mockapi.io/users/${contactId}`)
-      .then((res) => {
-        setContact(res.data);
-      });
-  });
+  if (isPending) return 'Loading';
 
-  const handleDelete = () => {
-    axios
-      .delete(`https://65b36193770d43aba479a2f2.mockapi.io/users/${contactId}`)
-      .then((res) => {
-        history.push('/');
-      });
-  };
-
-  if (!contact) return 'loading';
+  if (error) return 'An error has occured...';
 
   return (
     <div id="contact">
@@ -54,7 +41,13 @@ export default function Contact() {
         {contact.description && <p>{contact.description}</p>}
 
         <div>
-          <button className="delete" onClick={handleDelete}>
+          <button
+            className="delete"
+            onClick={() => {
+              deleteContactMutation.mutate(contactId);
+              history.push('/');
+            }}
+          >
             Delete
           </button>
         </div>

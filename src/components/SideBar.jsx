@@ -1,17 +1,13 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useContacts } from '../services/queries';
 import { Link, NavLink } from 'react-router-dom';
 
 export default function SideBar() {
-  const [contacts, setContacts] = useState([]);
+  const { data: contacts, isPending, error } = useContacts();
 
-  useEffect(() => {
-    axios
-      .get('https://65b36193770d43aba479a2f2.mockapi.io/users')
-      .then((res) => {
-        setContacts(res.data);
-      });
-  });
+  if (isPending) return 'Loading';
+
+  if (error) return 'An error has occured...';
 
   return (
     <div id="sidebar">
